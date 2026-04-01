@@ -43,8 +43,6 @@ public class Usuario implements UserDetails {
     private Integer seguidores;
     private Integer avaliacoes;
 
-    // METODOS OBRIGATÓRIOS DO SPRING SECURITY
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
@@ -59,7 +57,7 @@ public class Usuario implements UserDetails {
     public String getUsername() {
         return this.email;
     }
-
+    // metodos para bloquear contas(fazer depois)
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -79,4 +77,6 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }
