@@ -5,6 +5,7 @@ import com.ghiblibox.api.domain.Usuario;
 import com.ghiblibox.api.dto.DadosCadastroReview;
 import com.ghiblibox.api.dto.DadosListagemReview;
 import com.ghiblibox.api.repository.ReviewRepository;
+import com.ghiblibox.api.service.ReviewService; // Import do novo Service
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,23 +20,26 @@ import java.util.List;
 public class ReviewController {
 
     @Autowired
-    private ReviewRepository repository;
+    private ReviewRepository repository; // para os gets
+
+    @Autowired
+    private ReviewService reviewService;
 
     @PostMapping
     public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroReview dados) {
 
-        //  Descobre quem é o usuário logado através do Token
+        //  recebe quem é o usuário logado através do Token
         var usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Monta a nova Review com os dados que vieram do React e o usuário logado
+        // Monta a nova Review com os dados que vieram do front e o usuário logado
         Review novaReview = new Review();
         novaReview.setApiFilmeId(dados.apiFilmeId());
         novaReview.setNota(dados.nota());
         novaReview.setTexto(dados.texto());
         novaReview.setUsuario(usuarioLogado);
 
-        //  Salva a review no MariaDB
-        repository.save(novaReview);
+        // Quando a review for feita o usuário vai junto
+        reviewService.salvarReviewEAtualizarUsuario(novaReview, usuarioLogado);
 
         return ResponseEntity.ok().build();
     }
@@ -60,5 +64,4 @@ public class ReviewController {
 
         return ResponseEntity.ok(reviews);
     }
-
 }

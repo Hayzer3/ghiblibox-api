@@ -78,5 +78,9 @@ public class Usuario implements UserDetails {
         return true;
     }
 
-
+    //cada review feita tbm significa um filme novo assistido
+    public void adicionarAvaliacao() {
+        this.avaliacoes += 1;
+        this.qntFilmes += 1;
+    }
 }
