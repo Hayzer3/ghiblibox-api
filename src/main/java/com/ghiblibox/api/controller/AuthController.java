@@ -56,7 +56,9 @@ public class AuthController {
                 0,
                 0,
                 0,
-                0
+                0,
+                new java.util.HashSet<>(), // lista de quem ele segue
+                new java.util.HashSet<>()  // lista de seguidores
         );
 
         repository.save(novoUsuario);
