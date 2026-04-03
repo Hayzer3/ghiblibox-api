@@ -1,11 +1,14 @@
 package com.ghiblibox.api.controller;
 
 import com.ghiblibox.api.domain.Usuario;
+import com.ghiblibox.api.dto.UsuarioSimplesDTO;
 import com.ghiblibox.api.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -23,5 +26,17 @@ public class UsuarioController {
         service.alternarSeguir(id, usuarioLogado);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}/seguidores")
+    public ResponseEntity<List<UsuarioSimplesDTO>> listarSeguidores(@PathVariable Integer id) {
+        var seguidores = service.listarSeguidores(id);
+        return ResponseEntity.ok(seguidores);
+    }
+
+    @GetMapping("/{id}/seguindo")
+    public ResponseEntity<List<UsuarioSimplesDTO>> listarSeguindo(@PathVariable Integer id) {
+        var seguindo = service.listarSeguindo(id);
+        return ResponseEntity.ok(seguindo);
     }
 }

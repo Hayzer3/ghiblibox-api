@@ -1,10 +1,13 @@
 package com.ghiblibox.api.service;
 
 import com.ghiblibox.api.domain.Usuario;
+import com.ghiblibox.api.dto.UsuarioSimplesDTO;
 import com.ghiblibox.api.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class UsuarioService {
@@ -15,7 +18,6 @@ public class UsuarioService {
     @Transactional
     public void alternarSeguir(Integer idAlvo, Usuario usuarioLogadoDoToken) {
 
-        // busca o usuario alvo no banco
         var usuarioAlvo = repository.findById(idAlvo)
                 .orElseThrow(() -> new RuntimeException("usuário alvo não encontrado"));
 
@@ -35,8 +37,29 @@ public class UsuarioService {
             usuarioLogado.seguir(usuarioAlvo);
         }
 
-        // salva alteracoes no banco
         repository.save(usuarioLogado);
         repository.save(usuarioAlvo);
+    }
+
+    // lista de quem segue o usuario procurado
+    @Transactional(readOnly = true)
+    public List<UsuarioSimplesDTO> listarSeguidores(Integer idUsuario) {
+        var usuario = repository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return usuario.getSeguidoresLista().stream()
+                .map(UsuarioSimplesDTO::new)
+                .toList();
+    }
+
+    // lista de quem o usuário procurado esta seguindo
+    @Transactional(readOnly = true)
+    public List<UsuarioSimplesDTO> listarSeguindo(Integer idUsuario) {
+        var usuario = repository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return usuario.getSeguindoLista().stream()
+                .map(UsuarioSimplesDTO::new)
+                .toList();
     }
 }

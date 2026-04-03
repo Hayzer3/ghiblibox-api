@@ -17,15 +17,14 @@ public class ReviewService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Transactional // A rede de segurança!
+    @Transactional
     public void salvarReviewEAtualizarUsuario(Review novaReview, Usuario usuarioLogado) {
-        // 1. Salva a nova review no banco de dados
+        // salva a nova review no banco
         reviewRepository.save(novaReview);
 
-        // 2. Chama aquele método que criamos para aumentar o número (+1)
+        // metodo aumentar o número (+1)
         usuarioLogado.adicionarAvaliacao();
 
-        // 3. Salva o usuário atualizado no banco
         usuarioRepository.save(usuarioLogado);
     }
 }
