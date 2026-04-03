@@ -3,6 +3,7 @@ package com.ghiblibox.api.domain;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,13 +11,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "Usuario")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "idUsuario")
 public class Usuario implements UserDetails {
 
     @Id
@@ -57,7 +61,7 @@ public class Usuario implements UserDetails {
     public String getUsername() {
         return this.email;
     }
-    // metodos para bloquear contas(fazer depois)
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -82,5 +86,35 @@ public class Usuario implements UserDetails {
     public void adicionarAvaliacao() {
         this.avaliacoes += 1;
         this.qntFilmes += 1;
+    }
+
+    // --- SEGUIDORES ---
+
+    // lista de pessoas que este usuario ESTa SEGUINDO
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "tb_seguidores", //
+            joinColumns = @JoinColumn(name = "seguidor_id"), // Quem está clicando em seguir
+            inverseJoinColumns = @JoinColumn(name = "seguido_id") // Quem está recebendo o follow
+    )
+    private Set<Usuario> seguindoLista = new HashSet<>();
+    
+    @ManyToMany(mappedBy = "seguindoLista", fetch = FetchType.LAZY)
+    private Set<Usuario> seguidoresLista = new HashSet<>();
+
+    // Lógica de seguir
+    public void seguir(Usuario usuarioAlvo) {
+        this.seguindoLista.add(usuarioAlvo); // adiciona na lista
+        this.seguindo++;
+        usuarioAlvo.getSeguidoresLista().add(this); //
+        usuarioAlvo.setSeguidores(usuarioAlvo.getSeguidores() + 1); // contador de seguidores sobe
+    }
+
+    // deixar de seguir logico inversa
+    public void deixarDeSeguir(Usuario usuarioAlvo) {
+        this.seguindoLista.remove(usuarioAlvo);
+        this.seguindo--;
+        usuarioAlvo.getSeguidoresLista().remove(this);
+        usuarioAlvo.setSeguidores(usuarioAlvo.getSeguidores() - 1);
     }
 }
